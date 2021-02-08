@@ -8,5 +8,5 @@ chmod 0755 clamavfullscan.sh
 unlink /etc/cron.daily/clamscan_daily
 unlink /etc/cron.weekly/clamscan_weekly
 ln /home/clamav/clamavnormalscan.sh /etc/cron.daily/clamscan_daily
-ln /home/clamav/clamavfullscan.sh /etc/cron.daily/clamscan_weekly
+ln /home/clamav/clamavfullscan.sh /etc/cron.weekly/clamscan_weekly
 exit 0
