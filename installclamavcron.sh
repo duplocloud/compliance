@@ -1,8 +1,12 @@
 #!/bin/bash
 mkdir -p /home/clamav
 cd /home/clamav
-wget -O clamavrunscan.sh https://raw.githubusercontent.com/duplocloud/compliance/master/clamavrunscan.sh
-chmod 0755 clamavrunscan.sh
-unlink /etc/cron.hourly/clamscan_hourly
-ln /home/clamav/clamavrunscan.sh /etc/cron.hourly/clamscan_v1_hourly
+wget -O clamavnormalscan.sh https://raw.githubusercontent.com/duplocloud/compliance/master/clamavnormalscan.sh
+wget -O clamavfullscan.sh https://raw.githubusercontent.com/duplocloud/compliance/master/clamavfullscan.sh
+chmod 0755 clamavnormalscan.sh
+chmod 0755 clamavfullscan.sh
+unlink /etc/cron.daily/clamscan_daily
+unlink /etc/cron.weekly/clamscan_weekly
+ln /home/clamav/clamavnormalscan.sh /etc/cron.daily/clamscan_daily
+ln /home/clamav/clamavfullscan.sh /etc/cron.daily/clamscan_weekly
 exit 0
