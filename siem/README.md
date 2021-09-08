@@ -20,7 +20,7 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 	b. Call Duplo API and update the PUSH url in config
 	> POST /compliance/UpdateComplianceConfig
 		{
-		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****\&amp;TestID=550****\&amp;time=0"
+		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
 		}
 
 
