@@ -1,0 +1,156 @@
+{
+	"TenantId": "a677df6e-4b89-44cb-8cd7-72a0d2ddb47d",
+	"Name": "siem-setup",
+	"DisableAutoProvision": false,
+	"Roles": [
+		{
+			"Tags": [],
+			"Name": "system-svc-siemdashboard",
+			"DockerImage": "dummy:latest",
+			"Replicas": 1,
+			"NetworkId": "default",
+			"AgentPlatform": 0,
+			"Volumes": "",
+			"ExtraConfig": "",
+			"DnsPrfx": "siemdashboard",
+			"AllocationTags": "siem",
+			"IsInfraDeployment": false,
+			"LBConfigurations": [
+				{
+					"ReplicationControllerName": "system-svc-siemdashboard",
+					"Protocol": "https",
+					"Port": "443",
+					"DIPAddresses": [],
+					"HostPort": 0,
+					"IsInfraDeployment": false,
+					"CertificateArn": "arn:aws:acm:us-west-2:128329325849:certificate/39834e5e-0bc6-44b0-96fe-66e7dcd609e1",
+					"ExternalPort": 443,
+					"IsInternal": false,
+					"ForHealthCheck": false,
+					"HealthCheckUrl": "/proxy/duplosiem/app/wazuh",
+					"IsNative": true,
+					"LbType": 1,
+					"TgCount": 0
+				}
+			],
+			"OtherDockerHostConfig": "",
+			"DeviceIds": [],
+			"Cloud": 0,
+			"IsLBSyncedDeployment": false,
+			"IsDaemonset": false,
+			"IsReplicaCollocationAllowed": false
+		}
+	],
+	"NativeHosts": [
+		{
+			"FriendlyName": "siem",
+			"ImageId": "ami-017783576fb1892cb",
+			"Capacity": "t3.large",
+			"IsMinion": true,
+			"Zone": 1,
+			"AgentPlatform": 0,
+			"IsEbsOptimized": false,
+			"Cloud": 0,
+			"AllocatedPublicIp": false,
+			"MinionTags": [],
+			"EncryptDisk": false
+		}
+	],
+	"AzureHosts": [],
+	"NativeHostCustomData": [
+		{
+			"ComponentId": "siem",
+			"ComponentType": 2,
+			"Key": "AllocationTags",
+			"Value": "siem"
+		},
+		{
+			"ComponentId": "siem",
+			"ComponentType": 2,
+			"Key": "siem",
+			"Value": "true"
+		}
+	],
+	"CustomData": [],
+	"S3Buckets": [],
+	"SgRules": [
+		{
+			"ServiceType": 0,
+			"ToPort": 1514,
+			"FromPort": 1514,
+			"ServiceProtocol": "tcp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Agents connection services"
+				}
+			]
+		},
+		{
+			"ServiceType": 0,
+			"ToPort": 514,
+			"FromPort": 514,
+			"ServiceProtocol": "tcp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Syslog collector"
+				}
+			]
+		},
+		{
+			"ServiceType": 0,
+			"ToPort": 1515,
+			"FromPort": 1515,
+			"ServiceProtocol": "tcp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Agents registration access"
+				}
+			]
+		},
+		{
+			"ServiceType": 0,
+			"ToPort": 1516,
+			"FromPort": 1516,
+			"ServiceProtocol": "tcp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "SIEM cluster deamon"
+				}
+			]
+		},
+		{
+			"ServiceType": 0,
+			"ToPort": 514,
+			"FromPort": 514,
+			"ServiceProtocol": "udp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "SIEM syslog collector"
+				}
+			]
+		},
+		{
+			"ServiceType": 0,
+			"ToPort": 1514,
+			"FromPort": 1514,
+			"ServiceProtocol": "udp",
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Agents connection service"
+				}
+			]
+		}
+	]
+}
