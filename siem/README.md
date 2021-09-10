@@ -63,4 +63,5 @@ For existing customers Wazuh needs to be upgraded to new version, all the data s
 7. **Restore ES Data**: _cat/snapshots and restore the manual snapshot we have taken previously.
 8. **Update Compliance config**: For the new compliance manager, update the config 
 	>  \<add key="WAZUHCREDENTIALS" value="d2F6dWg6d2F6dWg=" /> 
-	
+9. **Create LB**: Include wazuh master host to Linux docker and stop proxy host. Create a service with dummy:latest and lb
+	Create Reverseproxy config for the same	
