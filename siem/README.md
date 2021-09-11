@@ -23,6 +23,32 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
 		}
 
+## Existing customers with new Compliance Onboarding
+1. Update Auth service and Create compliance service with latest binaries
+2. Open config file for ComplianceManager and keep only the below properties, all the other will be populate automatically
+	> \<add key="AUTOREPAIRCOUNT" value="10" />
+	<add key="WAZUHCREDENTIALS" value="d2F6dWg6d2F6dWg=" />
+	<add key="WAZUHUIURL" value="/proxy/duplosiem/app/wazuh" />
+	<add key="RESETCONFIG" value="true" />
+3. Open config file for Authservice and add the line 
+	> \ <add key="COMPLIANCEENDPOINT" value="http://127.0.0.1:40030" />
+4. Start both Auth and compliance service
+5. Create Tenant with name **compliance** in default plan
+6. Deploy compliance control plane: Add **siem_setup.svd** reference in this tenant.
+	> Change certificate ARN and TenantID in the SVD
+	    This SVD also has rules for 10.0.0.0/8(wazuh agents) to connect to wazuh master
+    	This will also has WAZUH AMI, dummy:latest service deployed for the LB 
+
+7. Add Reverse proxy configuration
+	a. **/duplosiem/**  to compliance ALB and forward proxy **/proxy/duplosiem/**
+	
+8. Add SIEM Push URL:
+	a. Create a new **PUSH Test**  in status cake, get the push URL
+	b. Call Duplo API and update the PUSH url in config
+	> POST /compliance/UpdateComplianceConfig
+		{
+		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
+		}
 
 ## Existing customers
 
@@ -59,9 +85,9 @@ For existing customers Wazuh needs to be upgraded to new version, all the data s
 		d. get new docker-compose.yml from this repo 
 		e. start the containers and verify the agents ids with the ones from downloaded csv	
 		f. verify everything in kibana	
-	
-7. **Restore ES Data**: _cat/snapshots and restore the manual snapshot we have taken previously.
-8. **Update Compliance config**: For the new compliance manager, update the config 
+7. **Update Wazuh config**: update wazuh configuration to listen on tcp port 1514 instead of udp 1514	
+8. **Restore ES Data**: _cat/snapshots and restore the manual snapshot we have taken previously.
+9. **Update Compliance config**: For the new compliance manager, update the config 
 	>  \<add key="WAZUHCREDENTIALS" value="d2F6dWg6d2F6dWg=" /> 
-9. **Create LB**: Include wazuh master host to Linux docker and stop proxy host. Create a service with dummy:latest and lb
+10. **Create LB**: Include wazuh master host to Linux docker and stop proxy host. Create a service with dummy:latest and lb
 	Create Reverseproxy config for the same	
