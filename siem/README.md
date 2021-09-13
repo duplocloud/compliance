@@ -86,8 +86,14 @@ For existing customers Wazuh needs to be upgraded to new version, all the data s
 		e. start the containers and verify the agents ids with the ones from downloaded csv	
 		f. verify everything in kibana	
 7. **Update Wazuh config**: update wazuh configuration to listen on tcp port 1514 instead of udp 1514	
-8. **Restore ES Data**: _cat/snapshots and restore the manual snapshot we have taken previously.
-9. **Update Compliance config**: For the new compliance manager, update the config 
+	
+8. **Update Compliance config**: For the new compliance manager, update the config 
 	>  \<add key="WAZUHCREDENTIALS" value="d2F6dWg6d2F6dWg=" /> 
-10. **Create LB**: Include wazuh master host to Linux docker and stop proxy host. Create a service with dummy:latest and lb
+9. **Create LB**: Include wazuh master host to Linux docker and stop proxy host. Create a service with dummy:latest and lb
 	Create Reverseproxy config for the same	
+10. **Restore ES Data**: 
+	> GET _snapshot/s3-repository/_all will show the list of all the repositories
+	> POST _snapshot/s3-repository/<<MANUAL_SNAPSHOT_NAME>>/_restore
+	  {
+	  	"indices": "security-alerts-3.x-*"
+	  }	
