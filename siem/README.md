@@ -62,13 +62,14 @@ For existing customers Wazuh needs to be upgraded to new version, all the data s
 	> PUT /_snapshot/s3-repository/wazuh-upgrade-20210906?wait_for_completion=true
 
 	Verify the status of the snapshot in kibana
-4. **Upgrade docker-compose**: the new docker-compose.yml needs the lastest docker-compose. SSH into host and run the below commands
+4. **Download Agents***: Go to the existing kibana and agents and download all the agents. This we will use later for verification. 	
+5. **Upgrade docker-compose**: the new docker-compose.yml needs the lastest docker-compose. SSH into host and run the below commands
 	> a. curl -L "https://github.com/docker/compose/releases/download/1.28.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 	> b. chmod +x /usr/local/bin/docker-compose
 	> c. sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 	> d. docker-compose --version (output: docker-compose version 1.28.3)
 
-5. **Flush Wazuh data**: Due to some bugs in the previous versions of wazuh, there are some unnecessary data files still present in the system. Restarting the wazuh-manager will clean all of them.
+6. **Flush Wazuh data**: Due to some bugs in the previous versions of wazuh, there are some unnecessary data files still present in the system. Restarting the wazuh-manager will clean all of them.
 	> /var/ossec/bin/ossec-control restart
 	
 	If the wazuh-db process is not killed then do a force stop and start
