@@ -53,7 +53,17 @@
 			"Cloud": 0,
 			"AllocatedPublicIp": false,
 			"MinionTags": [],
-			"EncryptDisk": false
+			"EncryptDisk": false,
+			"MetaData": [
+				{
+					"Key": "OsDiskSize",
+					"Value": 100
+				},
+				{
+					"Key": "MetadataServiceOption",
+					"Value": "enabled"
+				}
+			]
 		}
 	],
 	"AzureHosts": [],
