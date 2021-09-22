@@ -25,7 +25,7 @@
 					"IsInfraDeployment": false,
 					"CertificateArn": "arn:aws:acm:us-west-2:128329325849:certificate/39834e5e-0bc6-44b0-96fe-66e7dcd609e1",
 					"ExternalPort": 443,
-					"IsInternal": false,
+					"IsInternal": true,
 					"ForHealthCheck": false,
 					"HealthCheckUrl": "/proxy/duplosiem/app/wazuh",
 					"IsNative": true,
