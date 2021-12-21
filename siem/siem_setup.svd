@@ -44,7 +44,7 @@
 	"NativeHosts": [
 		{
 			"FriendlyName": "siem",
-			"ImageId": "ami-017783576fb1892cb",
+			"ImageId": "ami-02af2e673d893e685",
 			"Capacity": "t3.large",
 			"IsMinion": true,
 			"Zone": 1,
