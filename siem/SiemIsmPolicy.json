@@ -26,8 +26,7 @@
                 "actions": [
                     {
                         "snapshot": {
-                            "repository": "s3-repository",
-                            "snapshot": "security-alerts-snapshot"
+                            "repository": "s3-repository"
                         }
                     }
                 ],
