@@ -24,6 +24,23 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 		{
 		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
 		}
+5. If customer has windows vm, we need to add command on Duplo to trust all the hosts.
+	> winrm set winrm/config/client @{TrustedHosts="*"}`
+	
+	That will mostly fix the issue if the winrm commands still fails then run 	
+	> `winrm quickconfig -q
+	> 
+	> winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+	> 
+	> winrm set winrm/config/service/auth '@{Basic="true"}'
+	> 
+	> Start-Service WinRM
+	>
+	> set-service WinRM -StartupType Automatic	
+	>
+	> Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled false
+
+
 
 ## Existing customers with new Compliance Onboarding
 1. Update Auth service and Create compliance service with latest binaries
