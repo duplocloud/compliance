@@ -8,8 +8,9 @@ echo "Looking for ClamAV database updates...";
 freshclam --quiet;
 
 echo "Starting a full weekend scan.";
+mkdir -p /quarantined-virus
 
 # be nice to others while scanning the entire root
-nice -n5 clamscan -ri / --exclude-dir=/sys/ --stdout| logger -i -t clamd;
+nice -n5 clamscan -ri / --exclude-dir=/sys/ --exclude-dir=/quarantined-virus --stdout| logger -i -t clamd;
 
 exit 0
