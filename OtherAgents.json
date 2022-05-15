@@ -10,12 +10,12 @@
         "WindowsAgentUninstallCmd": "$app = Get-WmiObject -Class Win32_Product -Filter \\\"Name = 'AWS Agent'\\\"; $app.Uninstall()"
     },
     {
-        "AgentName": "CloudWatchAgent_0",
+        "AgentName": "CloudWatchAgent_v1",
         "AgentWindowsPackagePath": "",
         "AgentLinuxPackagePath": "https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
         "WindowsAgentServiceName": "amazon-cloudwatch-agent",
         "LinuxAgentServiceName": "amazon-cloudwatch-agent",
-        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb; sudo dpkg -i -E ./amazon-cloudwatch-agent.deb; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://cf-templates-3qf987fmmv5g-us-east-2.s3.us-east-2.amazonaws.com/amazon-cloudwatch-agent.json; sudo service amazon-cloudwatch-agent restart; else wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm; sudo rpm -U ./amazon-cloudwatch-agent.rpm; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://cf-templates-3qf987fmmv5g-us-east-2.s3.us-east-2.amazonaws.com/amazon-cloudwatch-agent.json && sudo service amazon-cloudwatch-agent restart; fi",
+        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb; sudo dpkg -i -E ./amazon-cloudwatch-agent.deb; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://raw.githubusercontent.com/duplocloud/compliance/master/amazon-cloudwatch-agent-minimal.json; sudo service amazon-cloudwatch-agent restart; else wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm; sudo rpm -U ./amazon-cloudwatch-agent.rpm; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://raw.githubusercontent.com/duplocloud/compliance/master/amazon-cloudwatch-agent-minimal.json && sudo service amazon-cloudwatch-agent restart; fi",
         "LinuxAgentInstallStatusCmd": "sudo service amazon-cloudwatch-agent status | grep -wc 'running'",
         "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get purge --yes --force-yes amazon-cloudwatch-agent; else sudo yum remove -y AwsAgent; fi"
     },
