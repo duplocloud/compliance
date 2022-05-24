@@ -1,0 +1,65 @@
+{
+	"Name": "zap-setup",
+    "DisableAutoProvision": false,
+    "Roles": [
+        {
+            "Tags": [],
+            "Name": "zap-context",
+            "DockerImage": "owasp/zap2docker-stable:latest",
+            "Replicas": 1,
+            "NetworkId": "default",
+            "AgentPlatform": 0,
+            "Volumes": "\"/zap:/zap/wrk/:rw\",\n\"/zaphome:/home/zap/\"",
+			"Base64UserData": "bWtkaXIgLXAgL3phcApjaG1vZCA3NzcgL3phcApta2RpciAtcCAvemFwaG9tZQpjaG1vZCA3NzcgL3phcGhvbWU="
+            "ExtraConfig": "",
+            "AllocationTags": "zap",
+            "ApplicationUrl": "",
+            "IsInfraDeployment": false,
+            "SecondaryTenant": "",
+            "LBConfigurations": [],
+            "OtherDockerConfig": "{\"Cmd\":\"zap-webswing.sh\"}",
+            "OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
+            "DeviceIds": [],
+            "Cloud": 0,
+            "IsLBSyncedDeployment": false,
+            "IsDaemonset": false,
+            "IsReplicaCollocationAllowed": false,
+            "TenantId": ""
+        }
+    ],
+    "RDSInstances": [],
+    "ECacheInstances": [],
+    "NativeHosts": [
+		{
+			"FriendlyName": "zap",
+			"ImageId": "ami-0cd7aeceb6d2423d0",
+			"Capacity": "t3.medium",
+			"IsMinion": true,
+			"Zone": 1,
+			"AgentPlatform": 0,
+			"IsEbsOptimized": false,
+			"Cloud": 0,
+			"AllocatedPublicIp": false,
+			"MinionTags": [],
+			"EncryptDisk": false
+		}
+	],
+    "AzureHosts": [],
+    "NativeHostCustomData": [
+        {
+            "ComponentId": "zap",
+            "ComponentType": 2,
+            "Key": "AllocationTags",
+            "Value": "zap"
+        },
+        {
+            "ComponentId": "zap",
+            "ComponentType": 2,
+            "Key": "zap",
+            "Value": "true"
+        }
+    ],
+    "CustomData": [],
+    "S3Buckets": [],
+    "SgRules": []
+}
