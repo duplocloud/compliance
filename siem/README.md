@@ -6,7 +6,6 @@ Hi! This explains the deployment of SIEM for new customers and upgrade of SIEM f
 ## New customers
 There are multiple changes in Compliance Manager, Now compliance manager will reconcile continuously and update the config itself. No manual intervention is needed except for **PUSH URL**
 
-0. Go to MSP AWS account and under KMS search for the key arn:aws:kms:us-west-2:128329325849:key/mrk-14da606d6b6f40dbb2be5630bec2e474 This is the key using which the SIEM AMI is encrypted. Click on the Key and at the bottom under "Other AWS Accounts" add the customer AWS account where you are deploying the SIEM
 
 1. Create Tenant with name **compliance** in default plan
 2. Deploy compliance control plane: Add **siem_setup.svd** reference in this tenant.
