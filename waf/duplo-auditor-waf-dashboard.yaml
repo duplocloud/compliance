@@ -1,0 +1,413 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Duplo Auditor and WAF Dashboard build on Amazon Elasticsearch Service.
+
+Parameters:
+  DataNodeEBSVolumeSize:
+    Type: Number
+    Default: 35
+    Description: Elasticsearch volume disk size
+
+  NodeType:
+    Type: String
+    Default: t2.medium.elasticsearch
+    Description: Elasticsearch Node Type
+
+  ElasticSerchDomainName:
+    Type: String
+    Default: 'duplo-auditor-waf'
+    AllowedPattern: "[a-z\\-]*"
+    Description: Elasticsearch domain name
+    
+  VPCID:
+    Type: String
+    Description: VPC ID where you want the ES to be created
+    
+  SubnetID:
+    Type: String
+    Description: Subnetid where you want the ES to be created
+
+Resources:
+
+  ESAuditorSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref VPCID
+      GroupDescription: "Security group for ElasticSearch auditor"
+      GroupName: "ElasticSearch-Auditor"
+      SecurityGroupIngress:
+        IpProtocol: "tcp"
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: "10.0.0.0/8"
+        
+  KibanaCustomizerLambda:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: "lambda_function.handler"
+      Role: !GetAtt KibanaCustomizerLambdaRole.Arn
+      Code:
+        S3Bucket: !Join
+          - ''
+          - - 'waf-dashboard-'
+            - !Ref "AWS::Region"
+        S3Key: "kibana-customizer-lambda.zip"
+      Runtime: "python3.7"
+      MemorySize: 128
+      Timeout: 160
+      VpcConfig:
+        SecurityGroupIds: [!Ref ESAuditorSG]
+        SubnetIds: [!Ref SubnetID]
+      Environment:
+        Variables:
+          REGION : !Ref "AWS::Region"
+          ACCOUNT_ID : !Ref "AWS::AccountId"
+
+  KibanaCustomizerLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: KibanaCustomizerPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'es:UpdateElasticsearchDomainConfig'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'events:PutRule'
+                  - 'events:DeleteRule'
+                  - 'lambda:AddPermission'
+                  - 'events:PutTargets'
+                  - 'events:RemoveTargets'
+                  - 'lambda:RemovePermission'
+                  - 'iam:PassRole'
+                  - 'waf:ListWebACLs'
+                  - 'waf-regional:ListWebACLs'
+                  - 'waf:ListRules'
+                  - 'waf-regional:ListRules'
+                  - 'wafv2:ListWebACLs'
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeVpcAttribute
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:CreateNetworkInterface
+                  - ec2:CreateNetworkInterfacePermission
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DeleteNetworkInterfacePermission
+                Resource: "*"
+
+  KinesisFirehoseS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+
+  ElasticsearchDomain:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      DomainName: !Ref ElasticSerchDomainName
+      ElasticsearchVersion: '7.7'
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: 'false'
+        InstanceCount: '1'
+        InstanceType: !Ref NodeType
+      EBSOptions:
+        EBSEnabled: true
+        Iops: 0
+        VolumeSize: !Ref DataNodeEBSVolumeSize
+        VolumeType: 'gp2'
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: '0'
+      AccessPolicies:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action: "es:*"
+            Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/*"
+      VPCOptions: 
+        SecurityGroupIds: [!Ref ESAuditorSG]
+        SubnetIds: [!Ref SubnetID]
+
+  KinesisFirehoseDeliveryRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 'sts:AssumeRole'
+            Principal:
+              Service:
+                - 'firehose.amazonaws.com'
+
+  KinesisFirehoseDeliveryPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: 'WAFDeliveryPolicy'
+      Roles:
+        - !Ref KinesisFirehoseDeliveryRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - s3:AbortMultipartUpload
+            - s3:GetBucketLocation
+            - s3:GetObject
+            - s3:ListBucket
+            - s3:ListBucketMultipartUploads
+            - s3:PutObject
+          Resource:
+            - !Sub 'arn:aws:s3:::${KinesisFirehoseS3Bucket}'
+            - !Sub 'arn:aws:s3:::${KinesisFirehoseS3Bucket}/*'
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - lambda:GetFunctionConfiguration
+          Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:%FIREHOSE_DEFAULT_FUNCTION%:%FIREHOSE_DEFAULT_VERSION%'
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - es:DescribeElasticsearchDomain
+            - es:DescribeElasticsearchDomains
+            - es:DescribeElasticsearchDomainConfig
+            - es:ESHttpPost
+            - es:ESHttpPut
+          Resource:
+            - !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}"
+            - !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/*"
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - es:ESHttpGet
+          Resource:
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_all/_settings'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_cluster/stats'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/awswaf*/_mapping/superstore'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_nodes'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_nodes/stats'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_nodes/*/stats'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/_stats'
+            - !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${ElasticSerchDomainName}/awswaf*/_stats'
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - ec2:DescribeVpcs
+            - ec2:DescribeVpcAttribute
+            - ec2:DescribeSubnets
+            - ec2:DescribeSecurityGroups
+            - ec2:DescribeNetworkInterfaces
+            - ec2:CreateNetworkInterface
+            - ec2:CreateNetworkInterfacePermission
+            - ec2:DeleteNetworkInterface
+            - ec2:DeleteNetworkInterfacePermission
+          Resource: "*"
+        - Sid: ''
+          Effect: Allow
+          Action:
+            - logs:PutLogEvents
+          Resource:
+            - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/kinesisfirehose/waflogs:log-stream:*'
+        - Sid: ''
+          Effect: Allow
+          Action:
+          - kinesis:DescribeStream
+          - kinesis:GetShardIterator
+          - kinesis:GetRecords
+          Resource: !Sub 'arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/%FIREHOSE_STREAM_NAME%'
+        - Effect: Allow
+          Action:
+            - kms:Decrypt
+          Resource:
+            - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/%SSE_KEY_ARN%'
+          Condition:
+            StringEquals:
+              'kms:ViaService': !Sub 's3.${AWS::Region}.amazonaws.com'
+            StringLike:
+              'kms:EncryptionContext:aws:kinesis:arn': !Sub 'arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/%FIREHOSE_STREAM_NAME%'
+
+  KinesisFirehoseDeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: !Sub 'aws-waf-logs-elasticsearch'
+      DeliveryStreamType: "DirectPut"
+      ElasticsearchDestinationConfiguration:
+        BufferingHints:
+          IntervalInSeconds: "60"
+          SizeInMBs: 5
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: 'deliverystream'
+          LogStreamName: 'elasticsearchDelivery'
+        DomainARN: !GetAtt ElasticsearchDomain.Arn
+        IndexName: 'awswaf'
+        IndexRotationPeriod: "OneDay"
+        RetryOptions:
+          DurationInSeconds: "60"
+        RoleARN: !GetAtt KinesisFirehoseDeliveryRole.Arn
+        VpcConfiguration:
+          SecurityGroupIds: [!Ref ESAuditorSG]
+          SubnetIds: [!Ref SubnetID]
+          RoleARN: !GetAtt KinesisFirehoseDeliveryRole.Arn
+        S3BackupMode: "FailedDocumentsOnly"
+        S3Configuration:
+          BucketARN: !Sub 'arn:aws:s3:::${KinesisFirehoseS3Bucket}'
+          BufferingHints:
+            IntervalInSeconds: "60"
+            SizeInMBs: "50"
+          CompressionFormat: "UNCOMPRESSED"
+          Prefix: 'log/'
+          RoleARN: !GetAtt KinesisFirehoseDeliveryRole.Arn
+          CloudWatchLoggingOptions:
+            Enabled: true
+            LogGroupName: "deliverystream"
+            LogStreamName: "s3Backup"
+
+  KibanaCustomizer:
+    Type: Custom::KibanaCustomizer
+    Properties:
+      ServiceToken: !GetAtt KibanaCustomizerLambda.Arn
+      StackName: !Ref "AWS::StackName"
+      Region: !Ref "AWS::Region"
+      Host: !GetAtt ElasticsearchDomain.DomainEndpoint
+      AccountID: !Ref "AWS::AccountId"
+
+  KibanaUpdate:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: "lambda_function.update_kibana"
+      Role: !GetAtt KibanaCustomizerLambdaRole.Arn
+      Code:
+        S3Bucket: !Join
+          - ''
+          - - 'waf-dashboard-'
+            - !Ref "AWS::Region"
+        S3Key: "kibana-customizer-lambda.zip"
+      Runtime: "python3.7"
+      MemorySize: 128
+      Timeout: 160
+      VpcConfig:
+        SecurityGroupIds: [!Ref ESAuditorSG]
+        SubnetIds: [!Ref SubnetID]
+      Environment:
+        Variables:
+          ES_ENDPOINT : !GetAtt ElasticsearchDomain.DomainEndpoint
+          REGION : !Ref "AWS::Region"
+          ACCOUNT_ID : !Ref "AWS::AccountId"
+
+
+  WAFv2Modification:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: WAF Dashboard - detects new WebACL and rules for WAFv2.
+      EventPattern:
+        source:
+          - "aws.wafv2"
+        detail-type:
+          - "AWS API Call via CloudTrail"
+        detail:
+          eventSource:
+            - wafv2.amazonaws.com
+          eventName:
+            - CreateWebACL
+            - CreateRule
+      Name: WAFv2Modification
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !GetAtt KibanaUpdate.Arn
+          Id: "1"
+
+
+  WAFGlobalModification:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: WAF Dashboard - detects new WebACL and rules for WAF Global.
+      EventPattern:
+        source:
+          - "aws.waf"
+        detail-type:
+          - "AWS API Call via CloudTrail"
+        detail:
+          eventSource:
+            - waf.amazonaws.com
+          eventName:
+            - CreateWebACL
+            - CreateRule
+      Name: WAFGlobalModification
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !GetAtt KibanaUpdate.Arn
+          Id: "1"
+
+  WAFRegionalModification:
+   Type: AWS::Events::Rule
+   Properties:
+     Description: WAF Dashboard - detects new WebACL and rules for WAF Regional.
+     EventPattern:
+       source:
+         - "aws.waf-regional"
+       detail-type:
+         - "AWS API Call via CloudTrail"
+       detail:
+         eventSource:
+           - waf-regional.amazonaws.com
+         eventName:
+           - CreateWebACL
+           - CreateRule
+     Name: WAFRegionalModification
+     State: "ENABLED"
+     Targets:
+       -
+         Arn: !GetAtt KibanaUpdate.Arn
+         Id: "1"
+
+  KibanaUpdateWAFGlobalPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref KibanaUpdate
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt WAFGlobalModification.Arn
+
+  KibanaUpdateWAFv2Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref KibanaUpdate
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt WAFv2Modification.Arn
+
+  KibanaUpdateWAFRegionalPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref KibanaUpdate
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt WAFRegionalModification.Arn
+
+Outputs:
+
+  DashboardLinkOutput:
+    Description: Link to WAF Dashboard
+    Value: !Join
+      - ''
+      - - 'https://'
+        - !GetAtt ElasticsearchDomain.DomainEndpoint
+        - '/_plugin/kibana/'

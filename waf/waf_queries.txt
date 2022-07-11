@@ -1,0 +1,25 @@
+GET _search?size=100&filter_path=aggregations.distinct_rulegroup.buckets
+{
+  "query": {
+				"exists": {
+				  "field": "ruleGroupList.terminatingRule.ruleId"
+				}
+			},
+	"_source": ["ruleGroupList.terminatingRule.ruleId"],
+	"aggs": {
+	  "distinct_rulegroup": {
+	    "terms": {
+	      "field": "ruleGroupList.ruleGroupId.keyword",
+	      "size": 100
+	    },
+	    "aggs": {
+	      "distinct_rule": {
+	        "terms": {
+    	      "field": "ruleGroupList.terminatingRule.ruleId.keyword",
+    	      "size": 100
+    	    }
+	      }
+	    }
+	  }
+	}
+}
