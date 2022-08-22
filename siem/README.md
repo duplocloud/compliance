@@ -8,7 +8,7 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 
 
 1. Create Tenant with name **compliance** in default plan
-2. Deploy compliance control plane: Add **siem_setup.svd** reference in this tenant.
+2. Deploy compliance control plane: Add [siem_setup.svd](./siem_setup.svd) reference in this tenant.
 	> Change certificate ARN and TenantID in the SVD
 	    This SVD also has rules for 10.0.0.0/8(wazuh agents) to connect to wazuh master
     	This will also has WAZUH AMI, dummy:latest service deployed for the LB 
