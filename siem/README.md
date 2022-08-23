@@ -13,17 +13,18 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 	    This SVD also has rules for 10.0.0.0/8(wazuh agents) to connect to wazuh master
     	This will also has WAZUH AMI, dummy:latest service deployed for the LB 
 
-3. Add Reverse proxy configuration
+3. Add Reverse proxy configuration from DuploCloud UI (Administrator > System Settings > Reverse Proxy)
+
 	a. **/duplosiem/**  to compliance ALB and forward proxy **/proxy/duplosiem/**
 
 4. Add SIEM Push URL:
 	a. Create a new **PUSH Test**  in status cake, get the push URL
-	b. Call Duplo API and update the PUSH url in config
+	b. Call DuploCloud API and update the PUSH url in config
 	> POST /compliance/UpdateComplianceConfig
 		{
 		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
 		}
-5. If customer has windows vm, we need to add command on Duplo to trust all the hosts.
+5. If customer has windows vm, we need to add command on DuploCloud to trust all the hosts.
 	> winrm set winrm/config/client @{TrustedHosts="*"}`
 	
 	That will mostly fix the issue if the winrm commands still fails then run 	
@@ -62,7 +63,7 @@ There are multiple changes in Compliance Manager, Now compliance manager will re
 	
 8. Add SIEM Push URL:
 	a. Create a new **PUSH Test**  in status cake, get the push URL
-	b. Call Duplo API and update the PUSH url in config
+	b. Call DuploCloud API and update the PUSH url in config
 	> POST /compliance/UpdateComplianceConfig
 		{
 		"SIEMPUSHURL": "https://push.statuscake.com?PK=719ea****&amp;TestID=550****&amp;time=0"
