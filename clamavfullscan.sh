@@ -11,6 +11,6 @@ echo "Starting a full weekend scan.";
 mkdir -p /quarantined-virus
 
 # be nice to others while scanning the entire root
-nice -n5 clamscan -ri / --exclude-dir=/sys/ --exclude-dir=/quarantined-virus --stdout| logger -i -t clamd & cpulimit -l 30 -z -e clamscan;
+nice -n5 clamscan -ri / --exclude-dir=/sys/ --exclude-dir=/quarantined-virus --stdout | logger -i -t clamd & cpulimit -l 30 -z -e clamscan;
 
 exit 0
