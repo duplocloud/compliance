@@ -30,13 +30,23 @@
         "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge clamav; else sudo yum remove -y clamav*; fi"
     },
     {
-        "AgentName": "clamav_scanner_v6",
+        "AgentName": "clamav_scanner_v7",
         "AgentWindowsPackagePath": "",
         "AgentLinuxPackagePath": "https://www.google.com",
         "WindowsAgentServiceName": "",
         "LinuxAgentServiceName": "clamav-freshclam",
         "LinuxInstallCmd": "sudo unlink /etc/cron.hourly/clamscan_*; sudo wget -O installclamavcron.sh https://raw.githubusercontent.com/duplocloud/compliance/master/installclamavcron.sh; sudo chmod 0755 installclamavcron.sh; sudo ./installclamavcron.sh",
-        "LinuxAgentInstallStatusCmd": "ls -la /etc/cron.daily | grep -wc 'clamscan_daily'",
+        "LinuxAgentInstallStatusCmd": "ls -la /etc/cron.daily | grep -wc 'clamscan_daily_v2'",
         "LinuxAgentUninstallStatusCmd": "sudo unlink /etc/cron.daily/clamscan_daily; sudo unlink /etc/cron.weekly/clamscan_weekly"
+    },
+    {
+        "AgentName": "cpulimit_v0",
+        "AgentWindowsPackagePath": "",
+        "AgentLinuxPackagePath": "https://www.google.com",
+        "WindowsAgentServiceName": "",
+        "LinuxAgentServiceName": "clamav-freshclam",
+        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y cpulimit; fi",
+        "LinuxAgentInstallStatusCmd": "dpkg -l | less | grep -wc 'cpulimit'",
+        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge cpulimit; fi"
     }
 ]
