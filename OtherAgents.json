@@ -20,34 +20,14 @@
         "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get purge --yes --force-yes amazon-cloudwatch-agent; else sudo yum remove -y AwsAgent; fi"
     },
     {
-        "AgentName": "ClamAV_v0",
+        "AgentName": "ClamAV_v1",
         "AgentWindowsPackagePath": "",
         "AgentLinuxPackagePath": "https://www.google.com",
         "WindowsAgentServiceName": "",
         "LinuxAgentServiceName": "clamav-freshclam",
-        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y clamav; else sudo amazon-linux-extras install -y epel; sudo yum install clamav clamd -y; sudo service clamav-freshclam start; fi",
-        "LinuxAgentInstallStatusCmd": "sudo service clamav-freshclam status | grep -wc 'running'",
-        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge clamav; else sudo yum remove -y clamav*; fi"
-    },
-    {
-        "AgentName": "clamav_scanner_v7",
-        "AgentWindowsPackagePath": "",
-        "AgentLinuxPackagePath": "https://www.google.com",
-        "WindowsAgentServiceName": "",
-        "LinuxAgentServiceName": "clamav-freshclam",
-        "LinuxInstallCmd": "sudo unlink /etc/cron.hourly/clamscan_*; sudo wget -O installclamavcron.sh https://raw.githubusercontent.com/duplocloud/compliance/master/installclamavcron.sh; sudo chmod 0755 installclamavcron.sh; sudo ./installclamavcron.sh",
-        "LinuxAgentInstallStatusCmd": "ls -la /etc/cron.daily | grep -wc 'clamscan_daily_v2'",
-        "LinuxAgentUninstallStatusCmd": "sudo unlink /etc/cron.daily/clamscan_daily; sudo unlink /etc/cron.weekly/clamscan_weekly"
-    },
-    {
-        "AgentName": "cpulimit_v0",
-        "AgentWindowsPackagePath": "",
-        "AgentLinuxPackagePath": "https://www.google.com",
-        "WindowsAgentServiceName": "",
-        "LinuxAgentServiceName": "clamav-freshclam",
-        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y cpulimit; fi",
-        "LinuxAgentInstallStatusCmd": "dpkg -l | less | grep -wc 'cpulimit'",
-        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge cpulimit; fi"
+        "LinuxAgentInstallStatusCmd": "clamav_status=$(sudo service clamav-freshclam status | grep -wc 'running'); clamscan_status=$(ls -la /etc/cron.daily | grep -wc 'clamscan_daily_v2'); cpulimit_status=$(dpkg -l | less | grep -wc 'cpulimit'); status=$((clamav_status * clamscan_status * cpulimit_status)); echo $status;",
+        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y clamav cpulimit; sudo wget -O installclamavcron.sh https://raw.githubusercontent.com/duplocloud/compliance/master/installclamavcron.sh; sudo chmod 0755 installclamavcron.sh; sudo ./installclamavcron.sh; else sudo amazon-linux-extras install -y epel; sudo yum install clamav clamd -y; sudo service clamav-freshclam start; fi",
+        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge clamav cpulimit; sudo unlink /etc/cron.daily/clamscan_daily_v2; sudo unlink /etc/cron.weekly/clamscan_weekly_v2; else sudo yum remove -y clamav*; fi"
     },
     {
         "AgentName": "SSMAgent_v2",
@@ -58,5 +38,5 @@
         "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo snap remove amazon-ssm-agent; wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb; sudo dpkg -i -E ./amazon-ssm-agent.deb; else sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm; fi",
         "LinuxAgentInstallStatusCmd": "sudo service amazon-ssm-agent status | grep -wc 'running'",
         "LinuxAgentUninstallStatusCmd": ""
-    }   
+    }
 ]
