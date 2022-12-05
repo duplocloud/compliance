@@ -1,5 +1,5 @@
 {
-	"TenantId": "a677df6e-4b89-44cb-8cd7-72a0d2ddb47d",
+	"TenantId": "##REPLACE_WITH_COMPLIANCE_TENANT_ID##",
 	"Name": "siem-setup",
 	"DisableAutoProvision": false,
 	"Roles": [
@@ -23,7 +23,7 @@
 					"DIPAddresses": [],
 					"HostPort": 0,
 					"IsInfraDeployment": false,
-					"CertificateArn": "arn:aws:acm:us-west-2:128329325849:certificate/39834e5e-0bc6-44b0-96fe-66e7dcd609e1",
+					"CertificateArn": "##REPLACE_WITH_DEFAULT_PLAN_CERTIFICATE_ARN##",
 					"ExternalPort": 443,
 					"IsInternal": true,
 					"ForHealthCheck": false,
