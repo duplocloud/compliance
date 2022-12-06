@@ -25,9 +25,9 @@
         "AgentLinuxPackagePath": "https://www.google.com",
         "WindowsAgentServiceName": "",
         "LinuxAgentServiceName": "clamav-freshclam",
-        "LinuxAgentInstallStatusCmd": "clamav_status=$(sudo service clamav-freshclam status | grep -wc 'running'); clamscan_status=$(ls -la /etc/cron.daily | grep -wc 'clamscan_daily_v2'); cpulimit_status=$(dpkg -l | less | grep -wc 'cpulimit'); status=$((clamav_status * clamscan_status * cpulimit_status)); echo $status;",
-        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y clamav cpulimit; else sudo amazon-linux-extras install -y epel; sudo yum install clamav clamd cpulimit -y; sudo service clamav-freshclam start; fi; sudo wget -O installclamavcron.sh https://raw.githubusercontent.com/duplocloud/compliance/master/installclamavcron.sh; sudo chmod 0755 installclamavcron.sh; sudo ./installclamavcron.sh;",
-        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge clamav cpulimit; else sudo yum remove -y clamav* cpulimit; fi; sudo unlink /etc/cron.daily/clamscan_daily_v2; sudo unlink /etc/cron.weekly/clamscan_weekly_v2;"
+        "LinuxAgentInstallStatusCmd": "clamav_status=$(sudo service clamav-freshclam status | grep -wc 'running'); clamscan_status=$(ls -la /etc/cron.daily | grep -wc 'clamscan_daily_v2'); cpulimit_status=$(dpkg -l | less | grep -wc 'cpulimit'); status=$((clamav_status * clamscan_status * cpulimit_status)); echo $status",
+        "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get update; sudo apt-get install -y clamav cpulimit; else sudo amazon-linux-extras install -y epel; sudo yum install clamav clamd cpulimit -y; sudo service clamav-freshclam start; fi; sudo wget -O installclamavcron.sh https://raw.githubusercontent.com/duplocloud/compliance/master/installclamavcron.sh; sudo chmod 0755 installclamavcron.sh; sudo ./installclamavcron.sh",
+        "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get autoremove -y --purge clamav cpulimit; else sudo yum remove -y clamav* cpulimit; fi; sudo unlink /etc/cron.daily/clamscan_daily_v2; sudo unlink /etc/cron.weekly/clamscan_weekly_v2"
     },
     {
         "AgentName": "SSMAgent_v2",
