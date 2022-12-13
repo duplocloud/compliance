@@ -10,7 +10,7 @@
         "WindowsAgentUninstallCmd": "$app = Get-WmiObject -Class Win32_Product -Filter \\\"Name = 'AWS Agent'\\\"; $app.Uninstall()"
     },
     {
-        "AgentName": "CloudWatchAgent_v1",
+        "AgentName": "CloudWatchAgent_v2",
         "AgentWindowsPackagePath": "",
         "AgentLinuxPackagePath": "https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
         "WindowsAgentServiceName": "amazon-cloudwatch-agent",
