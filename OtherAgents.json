@@ -10,13 +10,13 @@
         "WindowsAgentUninstallCmd": "$app = Get-WmiObject -Class Win32_Product -Filter \\\"Name = 'AWS Agent'\\\"; $app.Uninstall()"
     },
     {
-        "AgentName": "CloudWatchAgent_v4",
+        "AgentName": "CloudWatchAgent_v5",
         "AgentWindowsPackagePath": "",
         "AgentLinuxPackagePath": "https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
         "WindowsAgentServiceName": "amazon-cloudwatch-agent",
         "LinuxAgentServiceName": "amazon-cloudwatch-agent",
         "LinuxInstallCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then rm -rf amazon-cloudwatch-agent.*; wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb; sudo dpkg -i -E ./amazon-cloudwatch-agent.deb; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://raw.githubusercontent.com/duplocloud/compliance/master/amazon-cloudwatch-agent-minimal.json; sudo service amazon-cloudwatch-agent restart; else rm -rf amazon-cloudwatch-agent.*; wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm; sudo rpm -U ./amazon-cloudwatch-agent.rpm; sudo wget -O /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json https://raw.githubusercontent.com/duplocloud/compliance/master/amazon-cloudwatch-agent-minimal.json && sudo service amazon-cloudwatch-agent restart; fi",
-        "LinuxAgentInstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo dpkg -l | less | grep -wc 'amazon-cloudwatch-agent'; else sudo yum list installed | grep -wc 'amazon-cloudwatch-agent'; fi",
+        "LinuxAgentInstallStatusCmd": "cwagentstatus=$(sudo service amazon-cloudwatch-agent status | grep -wc 'running'); echo $cwagentstatus;",
         "LinuxAgentUninstallStatusCmd": "OS_FAMILY=$(cat /etc/os-release | grep PRETTY_NAME); if [[ $OS_FAMILY == *'Ubuntu'* ]]; then sudo apt-get purge --yes --force-yes amazon-cloudwatch-agent; else sudo yum remove amazon-cloudwatch-agent -y; fi"
     },
     {
