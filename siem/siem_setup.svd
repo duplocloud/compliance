@@ -45,7 +45,7 @@
 		{
 			"FriendlyName": "siem",
 			"ImageId": "ami-02af2e673d893e685",
-			"Capacity": "t3.large",
+			"Capacity": "t3a.xlarge",
 			"IsMinion": true,
 			"Zone": 1,
 			"AgentPlatform": 0,
