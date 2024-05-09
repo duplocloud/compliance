@@ -21,4 +21,13 @@ Disc Size :        100
  - dashboard
  
  as follow
-  - Opensearch Service Deployment : 
+  - Opensearch Service Deployment :
+    - Navigate to `Docker` tab.
+    - Select `services`.
+    - Add new service with configuration as follows:
+       - Name : opensearch
+       - DockerImage: duplocloud/wazuh-indexer:4.7.2-ssl
+       - DockerNetwork : Host Network
+       - AllocationTag : siem
+       - EnvironementVariables : "OPENSEARCH_JAVA_OPTS":"-Xms3g -Xmx3g"
+       - Volumes : "/data/es:/var/lib/wazuh-indexer"
