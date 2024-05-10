@@ -40,7 +40,7 @@ Disc Size :        100
        - DockerImage: duplocloud/wazuh-manager:4.7.2-ssl
        - DockerNetwork : Host Network
        - AllocationTag : siem
-       - EnvironementVariables :  "INDEXER_URL":"https://localhost:9200", "INDEXER_USERNAME":"admin", "INDEXER_PASSWORD":"VyTeLYbHb@t9ayg", "FILEBEAT_SSL_VERIFICATION_MODE" : "none", "API_USERNAME" : "wazuh-wui", "API_PASSWORD" : "UTim*Ppu9MXyQ6hm"
+       - EnvironementVariables : <br /> "INDEXER_URL" : "https://localhost:9200",<br /> "INDEXER_USERNAME" : "admin", <br />"INDEXER_PASSWORD" : "VyTeLYbHb@t9ayg",<br /> "FILEBEAT_SSL_VERIFICATION_MODE" : "none",<br /> "API_USERNAME" : "wazuh-wui", <br />"API_PASSWORD" : "UTim*Ppu9MXyQ6hm"
        - Volumes : "/data/ossec_api_configuration:/var/ossec/api/configuration","/data/ossec_etc:/var/ossec/etc"
 
   - Dashboard Service Deployment:
@@ -51,7 +51,7 @@ Disc Size :        100
        - DockerImage: duplocloud/wazuh-dashboard:4.7.2-ssl
        - DockerNetwork : Host Network
        - AllocationTag : siem
-       - EnvironementVariables : "OPENSEARCH_HOSTS" : "https://localhost:9200" , "WAZUH_API_URL" : "https://localhost" , "API_PORT" : 55000, "RUN_AS": false, "INDEXER_USERNAME" : "admin" , "INDEXER_PASSWORD" : "VyTeLYbHb@t9ayg", "API_USERNAME" : "wazuh-wui", "API_PASSWORD" : "UTim*Ppu9MXyQ6hm" , "DASHBOARD_USERNAME" : "kibanaserver" , "DASHBOARD_PASSWORD" : "L8JrB47!GNW3Zvx"
+       - EnvironementVariables :<br /> "OPENSEARCH_HOSTS" : "https://localhost:9200" ,<br /> "WAZUH_API_URL" : "https://localhost" , <br />"API_PORT" : 55000, "RUN_AS" : false, <br />"INDEXER_USERNAME" : "admin" , <br />"INDEXER_PASSWORD" : "VyTeLYbHb@t9ayg", <br />"API_USERNAME" : "wazuh-wui", <br />"API_PASSWORD" : "UTim*Ppu9MXyQ6hm" , <br />"DASHBOARD_USERNAME" : "kibanaserver" ,<br /> "DASHBOARD_PASSWORD" : "L8JrB47!GNW3Zvx"
 
 4. Expose dashboard service internally using load-balancer to establish communication between SIEM & OPENSEARCH services.
 5. Create application load-balancers with following configurations :
@@ -107,7 +107,7 @@ Disc Size :        100
        
    9. Go to Duplo portal nad navigate to `SECURITY` tab. "SIEM" will be available by now.
    10. Last part is to setup reverse proxy to access `DASHBOARD`.
-   11. Use following command to setup proxy. The command can be hit from local machine as well. **NOTE** that openvpn is connected before running command.
+   11. Use following command to setup proxy. The command can be hit from local machine as well. **NOTE** that openvpn is connected before running command.<br />
 curl --location 'https://<change>.duplocloud.net/admin/UpdateReverseProxyConfig' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer <token>' \
@@ -121,3 +121,4 @@ curl --location 'https://<change>.duplocloud.net/admin/UpdateReverseProxyConfig'
     ],
     "Authorization": "Basic d2F6dWhfdXNlcjpKZ0ZEUS5ZVEFaNEM3czk="
 }'
+12. Check SIEM dashboard to be up and running.
