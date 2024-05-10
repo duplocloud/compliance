@@ -92,3 +92,32 @@ Disc Size :        100
          - CIDR Range : 10.0.0.0/8
          - Protocol : TCP
          - Port-Range : 55000-55000
+
+   7. In order to setup reverse proxy we need to provide the credentials to the service. By default, kibana user credentials are configured with the service. We need to update to use `wazuh` credentials.
+   8. With encode we can use these `d2F6dWgtd3VpOlVUaW0qUHB1OU1YeVE2aG0=` credential to update the service.
+      - Steps:
+      - - SSM to master instance
+        - Navigate to `services` & locate `Duplo.ComplianceService`.
+        - Stop the service.
+        - Navigate to FOLDER section.
+        - Search `Duplo.ComplianceCore.exe.config` file under `Duplo.ComplianceService` folder.
+        - Open with Notepad ++
+        - Under "appSettings" section locate `WAZUHCREDENTIALS` and update with above credential.
+        - Save file & navigate to services to start `Duplo.ComplianceService`.
+       
+   9. Go to Duplo portal nad navigate to `SECURITY` tab. "SIEM" will be available by now.
+   10. Last part is to setup reverse proxy to access `DASHBOARD`.
+   11. Use following command to setup proxy. The command can be hit from local machine as well. **NOTE** that openvpn is connected before running command.
+curl --location 'https://<change>.duplocloud.net/admin/UpdateReverseProxyConfig' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <token>' \
+--data '{
+    "ProxyPath": "/duplosiem",
+    "BackendHostUrl": "https://<give-dashboard-service-url>",
+    "ForwardingPrefix": "/proxy/duplosiem",
+    "AllowedRoles": [
+        "Administrator",
+        "SecurityAdmin"
+    ],
+    "Authorization": "Basic d2F6dWhfdXNlcjpKZ0ZEUS5ZVEFaNEM3czk="
+}'
