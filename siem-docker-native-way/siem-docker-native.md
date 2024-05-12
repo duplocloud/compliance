@@ -7,13 +7,13 @@ Follow steps bellow to deploy siem:
 1. Create compliance tenant within duplo plan.
 Go through documentation to create tenant (https://docs.duplocloud.com/docs/aws-user-guide/quick-start/step-2-tenant)
 
-2. Create host with following configuration:
-Name :             SIEM
-AZ :               Automatic
-Instance Type :    t3a.xlarge
-Allocation Tag :   siem
-Image ID :         docker-duplo-ohio-ubuntu22
-Disc Size :        100
+2. Create host with following configuration:<br />
+Name :             SIEM<br />
+AZ :               Automatic<br />
+Instance Type :    t3a.xlarge<br />
+Allocation Tag :   siem<br />
+Image ID :         docker-duplo-ohio-ubuntu22<br />
+Disc Size :        100<br />
 
 3. Once SIEM host is up and running, deploy services
  - opensearch
