@@ -117,3 +117,30 @@ For existing customers Wazuh needs to be upgraded to new version, all the data s
 	  {
 	  	"indices": "security-alerts-3.x-*"
 	  }	
+
+**Found SIEM Installation Issue**
+
+An issue was found where customers using Docker Linux Hosts are not successfully installing the **AmazonAgentLinux2** for the SIEM. Therefore, they remain in a disconnected state. Repair attempts have been tested.
+
+The example error below is what displays in the Duplo Portal under **Security → Agents → 3 dots on Select agent → Agent Details**:
+
+```
+"DuploRepairResult": "CheckAndRepairAgent: Tenant_ID xxxx-xxxxx-xxxxx-xxx Failed to repair agent duploservices-name-of-host with exception Renci.SshNet.Common.SshAuthenticationException: Permission denied (publickey).\r\n
+```
+
+The log above explains that there is an SSH authentication issue with the installation, specifically with the **KeyPair** from the selected user.
+
+## Remediation
+
+The issue is that Duplo did not recognize the **ec2-user** key/pair associated with the host to install the network agent. You can manually add the **ec2-user** and image to the tenant to resolve issue.
+
+Follow the steps below:
+
+1. Go to **Administrator → Select Plans → Select the plan that contains the Tenant with your Host → Select Images → Select Add**.
+
+2. Fill out the following fields:
+   - **Name**: Name of Host
+   - **Image ID**: AMI
+   - **Username**: Example: ec2-user/root
+   - **Operating System**: Linux/Windows/Etc
+```
