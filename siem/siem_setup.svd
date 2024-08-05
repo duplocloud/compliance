@@ -7,110 +7,39 @@
 	"DisableAutoProvision": false,
 	"Roles": [
 		{
-			"Tags": [],
-			"Name": "elasticsearch",
-			"DockerImage": "duplocloud/es-odfe:4.1.5-r5",
+			"Name": "indexer",
+			"DockerImage": "duplocloud/wazuh-indexer:4.7.2-audit",
 			"Replicas": 1,
 			"NetworkId": "default",
 			"AgentPlatform": 0,
-			"Volumes": "\"/data/es:/usr/share/elasticsearch/data\"",
-			"ExtraConfig": "{\n\t\"cluster.name\": \"siem-cluster\",\n\t\"discovery.type\": \"single-node\",\n\t\"ES_JAVA_OPTS\": \"-Xms3g -Xmx3g\",\n\t\"bootstrap.memory_lock\": \"true\",\n    \"opendistro_security.disabled\": \"true\"\n}",
+			"Volumes": "\"/data/es:/var/lib/wazuh-indexer\"",
+			"ExtraConfig": "{\n\t\"OPENSEARCH_JAVA_OPTS\": \"-Xms3g -Xmx3g\"\n}",
 			"AllocationTags": "siem",
-			"ApplicationUrl": "",
-			"IsInfraDeployment": false,
-			"SecondaryTenant": "",
-			"LBConfigurations": [],
-			"OtherDockerConfig": "",
 			"OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
-			"DeviceIds": [],
-			"Cloud": 0,
-			"IsLBSyncedDeployment": true,
-			"ForceStatefulSet": false,
-			"IsDaemonset": false,
-			"IsReplicaCollocationAllowed": false,
-			"IsAnyHostAllowed": false,
-			"IsCloudCredsFromK8sServiceAccount": false,
-			"TenantId": ""
+			"Cloud": 0
 		},
 		{
-			"Tags": [],
 			"Name": "siem",
-			"DockerImage": "duplocloud/wazuh-odfe:4.1.5",
+			"DockerImage": "duplocloud/wazuh-manager:4.7.2-ssl",
 			"Replicas": 1,
 			"NetworkId": "default",
 			"AgentPlatform": 0,
 			"Volumes": "\"/data/ossec_api_configuration:/var/ossec/api/configuration\",\"/data/ossec_etc:/var/ossec/etc\"",
-			"ExtraConfig": "{\n    \"ELASTICSEARCH_URL\": \"http://localhost:9200\",\n    \"ELASTIC_USERNAME\": \"admin\",\n    \"ELASTIC_PASSWORD\": \"admin\",\n    \"FILEBEAT_SSL_VERIFICATION_MODE\": \"none\"\n}",
+			"ExtraConfig": "{\n    \"INDEXER_URL\": \"https://localhost:9200\",\n    \"INDEXER_USERNAME\": \"admin\",\n    \"INDEXER_PASSWORD\": \"##INDEXER_ADMIN_PASSWORD##\",\n    \"FILEBEAT_SSL_VERIFICATION_MODE\": \"none\",\n    \"SSL_CERTIFICATE_AUTHORITIES\":\"/etc/ssl/root-ca.pem\",\n    \"SSL_CERTIFICATE\":\"/etc/ssl/filebeat.pem\",\n    \"SSL_KEY\":\"/etc/ssl/filebeat.key\",\n    \"API_USERNAME\":\"wazuh-wui\",\n    \"API_PASSWORD\":\"##API_PASSWORD##\"\n}",
 			"AllocationTags": "siem",
-			"ApplicationUrl": "",
-			"IsInfraDeployment": false,
-			"SecondaryTenant": "",
-			"LBConfigurations": [],
-			"OtherDockerConfig": "",
 			"OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
-			"DeviceIds": [],
-			"Cloud": 0,
-			"IsLBSyncedDeployment": true,
-			"ForceStatefulSet": false,
-			"IsDaemonset": false,
-			"IsReplicaCollocationAllowed": false,
-			"IsAnyHostAllowed": false,
-			"IsCloudCredsFromK8sServiceAccount": false,
-			"TenantId": ""
+			"Cloud": 0
 		},
 		{
-			"Tags": [],
-			"Name": "kibana",
-			"DockerImage": "duplocloud/kibana-odfe:4.1.5",
+			"Name": "dashboard",
+			"DockerImage": "duplocloud/wazuh-dashboard:4.7.2-ssl",
 			"Replicas": 1,
 			"NetworkId": "default",
 			"AgentPlatform": 0,
-			"Volumes": "",
-			"ExtraConfig": "{\n\t\"ELASTICSEARCH_URL\": \"http://localhost:9200\",\n    \"ELASTICSEARCH_USERNAME\":\"admin\",\n\t\"ELASTICSEARCH_PASSWORD\":\"admin\",\n    \"WAZUH_API_URL\": \"https://localhost\",\n    \"API_PORT\": \"55000\",\n    \"API_USERNAME\": \"wazuh\",\n    \"API_PASSWORD\": \"wazuh\",\n\t\"PATTERN\":\"security-alerts-*\",\n\t\"SERVER_SSL_ENABLED\":\"true\",\n\t\"EXTENSIONS_AWS\":\"true\",\n\t\"EXTENSIONS_DOCKER\":\"true\",\n\t\"EXTENSIONS_CISCAT\":\"true\",\n\t\"ENABLED_SECURITY\":\"false\",\n\t\"SERVER_SSL_CERTIFICATE\":\"/usr/share/kibana/config/opendistroforelasticsearch.example.org.cert\",\n\t\"SERVER_SSL_KEY\":\"/usr/share/kibana/config/opendistroforelasticsearch.example.org.key\"\n}",
+			"ExtraConfig": "{\n    \"OPENSEARCH_HOSTS\": \"https://localhost:9200\",\n    \"INDEXER_USERNAME\":\"admin\",\n\t\"INDEXER_PASSWORD\":\"##INDEXER_ADMIN_PASSWORD##\",\n    \"WAZUH_API_URL\": \"https://localhost\",\n    \"API_PORT\": \"55000\",\n    \"API_USERNAME\": \"wazuh-wui\",\n    \"API_PASSWORD\": \"##API_PASSWORD##\",\n    \"RUN_AS\": false,\n    \"DASHBOARD_USERNAME\": \"kibanaserver\",\n     \"DASHBOARD_PASSWORD\":\"##INDEXER_KIBANA_PASSWORD##\"\n\t}",
 			"AllocationTags": "siem",
-			"ApplicationUrl": "",
-			"IsInfraDeployment": false,
-			"SecondaryTenant": "",
-			"LBConfigurations": [
-				{
-					"ReplicationControllerName": "kibana",
-					"Protocol": "https",
-					"Port": "5601",
-					"DIPAddresses": [],
-					"HostPort": 0,
-					"IsInfraDeployment": false,
-					"SetIngressHealthCheck": false,
-					"ExternalPort": 443,
-					"IsInternal": true,
-					"ForHealthCheck": false,
-					"HealthCheckUrl": "/proxy/duplosiem/api/status",
-					"CertificateArn": "##REPLACE_WITH_DEFAULT_PLAN_CERTIFICATE_ARN##",
-					"IsNative": true,
-					"LbType": 1,
-					"TgCount": 0,
-					"ExtraSelectorLabels": [],
-					"HealthCheckConfig": {
-						"HealthyThresholdCount": 0,
-						"UnhealthyThresholdCount": 0,
-						"HealthCheckTimeoutSeconds": 0,
-						"HealthCheckIntervalSeconds": 0
-					},
-					"LbIndex": 0,
-					"CustomCidrs": [],
-					"TenantId": ""
-				}
-			],
-			"OtherDockerConfig": "",
 			"OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
-			"DeviceIds": [],
-			"Cloud": 0,
-			"IsLBSyncedDeployment": true,
-			"ForceStatefulSet": false,
-			"IsDaemonset": false,
-			"IsReplicaCollocationAllowed": false,
-			"IsAnyHostAllowed": false,
-			"IsCloudCredsFromK8sServiceAccount": false,
-			"TenantId": ""
+			"Cloud": 0
 		}
 	],
 	"NativeHosts": [
@@ -179,6 +108,19 @@
 				{
 					"Type": 1,
 					"Value": "10.0.0.0/8",
+					"Description": "Wazuh API access"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 55000,
+			"FromPort": 55000,
+			"ServiceProtocol": "tcp"
+		},
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
 					"Description": "Syslog collector"
 				}
 			],
@@ -225,6 +167,25 @@
 			"ToPort": 1514,
 			"FromPort": 1514,
 			"ServiceProtocol": "udp"
+		}
+	],
+	"ReverseProxies": [
+		{
+			"ProxyPath": "/duplosiem",
+			"ForwardingPrefix": "/proxy/duplosiem",
+			"BackendHostUrl": "https://{{SIEM_HOST_IP}}:5601",
+			"AllowedRoles": [
+				"Administrator",
+				"SecurityAdmin"
+			],
+			"Authorization": "Basic ##REPLACE_WITH_LATEST_AMI##"
+		}
+	],
+	"SystemConfigs": [
+		{
+			"Type": "AppConfig",
+			"Key": "wazuh_config",
+			"Value": "{\"TenantId\":\"##REPLACE_WITH_COMPLIANCE_TENANT_ID##\", \"Username\":\"wazuh-wui\", \"Password\":\"##WAZUH_WUI_PASSWORD##\", \"SiemPushUrl\":\"##SIEM_PUSH_URL##\"}"
 		}
 	]
 }
