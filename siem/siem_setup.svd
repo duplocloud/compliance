@@ -185,7 +185,7 @@
 		{
 			"Type": "AppConfig",
 			"Key": "wazuh_config",
-			"Value": "{\"TenantId\":\"##REPLACE_WITH_COMPLIANCE_TENANT_ID##\", \"Username\":\"wazuh-wui\", \"Password\":\"##WAZUH_WUI_PASSWORD##\", \"SiemPushUrl\":\"##SIEM_PUSH_URL##\"}"
+			"Value": "{\"TenantId\":\"##REPLACE_WITH_COMPLIANCE_TENANT_ID##\", \"Username\":\"wazuh-wui\", \"Password\":\"##API_PASSWORD##\", \"IndexerUsername\":\"admin\", \"IndexerPassword\":\"##INDEXER_ADMIN_PASSWORD##\", \"SiemPushUrl\":\"##SIEM_PUSH_URL##\"}"
 		}
 	]
 }
