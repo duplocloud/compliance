@@ -1,0 +1,265 @@
+
+{
+	"TenantId": "##REPLACE_WITH_COMPLIANCE_TENANT_ID##",
+	"Name": "siem-setup",
+	"SchemaVersion": 1,
+	"ServiceType": "system",
+	"ServiceParameters": [],
+	"DisableAutoProvision": false,
+	"Roles": [
+        {
+            "Tags": [],
+            "Name": "opensearch",
+            "DockerImage": "duplocloud/wazuh-indexer:4.7.2-ssl",
+            "Replicas": 1,
+            "NetworkId": "default",
+            "AgentPlatform": 0,
+            "Volumes": "\"/data/es:/var/lib/wazuh-indexer\"",
+            "ExtraConfig": "{\n    \"OPENSEARCH_JAVA_OPTS\": \"-Xms3g -Xmx3g\"\n}",
+            "AllocationTags": "siem",
+            "ApplicationUrl": "",
+            "IsInfraDeployment": false,
+            "SecondaryTenant": "",
+            "LBConfigurations": [],
+            "OtherDockerConfig": "",
+            "OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
+            "DeviceIds": [],
+            "Cloud": 0,
+            "IsLBSyncedDeployment": true,
+            "ForceStatefulSet": false,
+            "IsDaemonset": false,
+            "IsReplicaCollocationAllowed": false,
+            "IsAnyHostAllowed": false,
+            "IsUniqueK8sNodeRequired": false,
+            "ShouldSpreadAcrossZones": false,
+            "IsCloudCredsFromK8sServiceAccount": false,
+            "TenantId": ""
+        },
+        {
+            "Tags": [],
+            "Name": "siem",
+            "DockerImage": "duplocloud/wazuh-manager:4.7.2-ssl",
+            "Replicas": 1,
+            "NetworkId": "default",
+            "AgentPlatform": 0,
+            "Volumes": "\"/data/ossec_api_configuration:/var/ossec/api/configuration\",\"/data/ossec_etc:/var/ossec/etc\"",
+            "ExtraConfig": "{\n    \"INDEXER_URL\": \"https://localhost:9200\",\n    \"INDEXER_USERNAME\": \"admin\",\n    \"INDEXER_PASSWORD\": \"VyTeLYbHb@t9ayg\",\n    \"FILEBEAT_SSL_VERIFICATION_MODE\": \"none\",\n    \"API_USERNAME\": \"wazuh-wui\",\n    \"API_PASSWORD\": \"UTim*Ppu9MXyQ6hm\"\n}",
+            "AllocationTags": "siem",
+            "ApplicationUrl": "",
+            "IsInfraDeployment": false,
+            "SecondaryTenant": "",
+            "LBConfigurations": [],
+            "OtherDockerConfig": "",
+            "OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
+            "DeviceIds": [],
+            "Cloud": 0,
+            "IsLBSyncedDeployment": true,
+            "ForceStatefulSet": false,
+            "IsDaemonset": false,
+            "IsReplicaCollocationAllowed": false,
+            "IsAnyHostAllowed": false,
+            "IsUniqueK8sNodeRequired": false,
+            "ShouldSpreadAcrossZones": false,
+            "IsCloudCredsFromK8sServiceAccount": false,
+            "TenantId": ""
+        },
+        {
+            "Tags": [],
+            "Name": "dashboard",
+            "DockerImage": "duplocloud/wazuh-dashboard:4.7.2-ssl",
+            "Replicas": 1,
+            "NetworkId": "default",
+            "AgentPlatform": 0,
+            "Volumes": "",
+            "ExtraConfig": "{\n    \"OPENSEARCH_HOSTS\": \"https://localhost:9200\",\n    \"WAZUH_API_URL\": \"https://localhost\",\n    \"API_PORT\": 55000,\n    \"RUN_AS\": false,\n    \"INDEXER_USERNAME\": \"admin\",\n    \"INDEXER_PASSWORD\": \"VyTeLYbHb@t9ayg\",\n    \"API_USERNAME\": \"wazuh-wui\",\n    \"API_PASSWORD\": \"UTim*Ppu9MXyQ6hm\",\n    \"DASHBOARD_USERNAME\": \"kibanaserver\",\n    \"DASHBOARD_PASSWORD\": \"L8JrB47!GNW3Zvx\"\n}",
+            "AllocationTags": "siem",
+            "ApplicationUrl": "",
+            "IsInfraDeployment": false,
+            "SecondaryTenant": "",
+            "LBConfigurations": [
+                {
+                    "ReplicationControllerName": "dashboard",
+                    "Protocol": "https",
+                    "Port": "5601",
+                    "DIPAddresses": [],
+                    "HostPort": 0,
+                    "IsInfraDeployment": false,
+                    "SetIngressHealthCheck": false,
+                    "ExternalPort": 443,
+                    "IsInternal": true,
+                    "ForHealthCheck": false,
+                    "HealthCheckUrl": "/proxy/duplosiem/translations/en.json",
+                    "CertificateArn": "##REPLACE_WITH_DEFAULT_PLAN_CERTIFICATE_ARN##",
+                    "IsNative": true,
+                    "LbType": 1,
+                    "TgCount": 0,
+                    "ExtraSelectorLabels": [],
+                    "HealthCheckConfig": {
+                        "HealthyThresholdCount": 0,
+                        "UnhealthyThresholdCount": 0,
+                        "HealthCheckTimeoutSeconds": 0,
+                        "HealthCheckIntervalSeconds": 0
+                    },
+                    "LbIndex": 0,
+                    "CustomCidrs": [],
+                    "TenantId": ""
+                },
+                {
+                    "ReplicationControllerName": "dashboard",
+                    "Protocol": "https",
+                    "Port": "55000",
+                    "DIPAddresses": [],
+                    "HostPort": 0,
+                    "IsInfraDeployment": false,
+                    "SetIngressHealthCheck": false,
+                    "ExternalPort": 55000,
+                    "IsInternal": true,
+                    "ForHealthCheck": false,
+                    "HealthCheckUrl": "/",
+                    "CertificateArn": "##REPLACE_WITH_DEFAULT_PLAN_CERTIFICATE_ARN##",
+                    "IsNative": true,
+                    "LbType": 1,
+                    "TgCount": 0,
+                    "ExtraSelectorLabels": [],
+                    "HealthCheckConfig": {
+                        "HealthyThresholdCount": 0,
+                        "UnhealthyThresholdCount": 0,
+                        "HealthCheckTimeoutSeconds": 0,
+                        "HealthCheckIntervalSeconds": 0,
+                        "HttpSuccessCode": "200-499"
+                    },
+                    "LbIndex": 0,
+                    "CustomCidrs": [],
+                    "TenantId": ""
+                }
+            ],
+            "OtherDockerConfig": "",
+            "OtherDockerHostConfig": "{\"NetworkMode\": \"host\", \"CapAdd\": [ \"NET_ADMIN\" ]}",
+            "DeviceIds": [],
+            "Cloud": 0,
+            "IsLBSyncedDeployment": true,
+            "ForceStatefulSet": false,
+            "IsDaemonset": false,
+            "IsReplicaCollocationAllowed": false,
+            "IsAnyHostAllowed": false,
+            "IsUniqueK8sNodeRequired": false,
+            "ShouldSpreadAcrossZones": false,
+            "IsCloudCredsFromK8sServiceAccount": false,
+            "TenantId": ""
+        }
+    ],
+	"NativeHosts": [
+		{
+			"Zone": 1,
+			"IsEbsOptimized": false,
+			"DesiredCapacity": 0,
+			"MinSize": 0,
+			"MaxSize": 0,
+			"MetaData": [
+				{
+					"Key": "OsDiskSize",
+					"Value": "100"
+				},
+				{
+					"Key": "MetadataServiceOption",
+					"Value": "enabled"
+				}
+			],
+			"UseLaunchTemplate": true,
+			"FriendlyName": "siem",
+			"ImageId": "##REPLACE_WITH_LATEST_AMI##",
+			"Capacity": "t3a.xlarge",
+			"IsMinion": true,
+			"Base64UserData": "IyEvYmluL2Jhc2gKZWNobyAiTWFraW5nIGRhdGEgZGlyZWN0b3J5Igpta2RpciAtcCAvZGF0YS9lcwpta2RpciAtcCAvZGF0YS9vc3NlY19hcGlfY29uZmlndXJhdGlvbgpta2RpciAtcCAvZGF0YS9vc3NlY19ldGMKCmVjaG8gIkdpdmluZyBwZXJtaXNzaW9ucyAiCmNobW9kIDc3NyAvZGF0YS9lcyAKY2htb2QgNzc3IC9kYXRhL29zc2VjX2FwaV9jb25maWd1cmF0aW9uCmNobW9kIDc3NyAvZGF0YS9vc3NlY19ldGMKZWNobyAiMTI3LjAuMC4xIiAkKGhvc3RuYW1lKSA+PiAvZXRjL2hvc3RzCmVjaG8gIlNldHRpbmcgbWF4X21hcF9jb3VudCBmb3Igb3BlbnNlYXJjaCIKc3lzY3RsIC13IHZtLm1heF9tYXBfY291bnQ9MjYyMTQ0CmVjaG8gInZtLm1heF9tYXBfY291bnQ9MjYyMTQ0IiA+PiAvZXRjL3N5c2N0bC5jb25mCgo=",
+			"AgentPlatform": 0,
+			"Cloud": 0,
+			"AllocatedPublicIp": false,
+			"MinionTags": [],
+			"EncryptDisk": false
+		}
+	],
+	"AzureHosts": [],
+	"NativeHostCustomData": [
+		{
+			"ComponentId": "siem",
+			"ComponentType": 2,
+			"Key": "AllocationTags",
+			"Value": "siem"
+		},
+		{
+			"ComponentId": "siem",
+			"ComponentType": 2,
+			"Key": "siem",
+			"Value": "true"
+		}
+	],
+	"CustomData": [],
+	"S3Buckets": [],
+	"SgRules": [
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Agents connection services"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 1514,
+			"FromPort": 1514,
+			"ServiceProtocol": "tcp"
+		},
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Syslog collector"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 514,
+			"FromPort": 514,
+			"ServiceProtocol": "tcp"
+		},
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "SIEM cluster deamon"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 1516,
+			"FromPort": 1516,
+			"ServiceProtocol": "tcp"
+		},
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "SIEM syslog collector"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 514,
+			"FromPort": 514,
+			"ServiceProtocol": "udp"
+		},
+		{
+			"SourceInfos": [
+				{
+					"Type": 1,
+					"Value": "10.0.0.0/8",
+					"Description": "Agents connection service"
+				}
+			],
+			"ServiceType": 0,
+			"ToPort": 1514,
+			"FromPort": 1514,
+			"ServiceProtocol": "udp"
+		}
+	]
+}
